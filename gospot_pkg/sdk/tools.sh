@@ -1,7 +1,7 @@
 #!/bin/bash
 # tools.sh - Installer ou mettre à jour le SDK GoSpot
 
-SDK_URL="https://gospot-sdk-host.onrender.com/public/gospot-sdk-1.0.0.tar.gz"
+SDK_URL="https://github.com/Mauricio-100/gospot-sdk-host/raw/main/public/gospot-sdk-1.0.0.tar.gz"
 SDK_DIR="$HOME/gospot-sdk-host"
 
 echo -e "\n${GREEN}Téléchargement du SDK GoSpot...${RESET}"
