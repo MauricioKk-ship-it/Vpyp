@@ -23,7 +23,7 @@ from pathlib import Path
 # -------------------------
 # CONFIG
 # -------------------------
-DEFAULT_SDK_URL = "https://gospot-sdk-host.onrender.com/gospot-sdk-1.0.0.tar.gz"
+DEFAULT_SDK_URL = "https://gospot-sdk-host.onrender.com/public/gospot-sdk-1.0.0.tar.gz"
 SDK_ENV_VAR = "GOSPOT_SDK_URL"
 SDK_DIR = Path(os.environ.get("GOSPOT_SDK_DIR", Path.home() / ".gospot-sdk")).expanduser()
 SCRIPTS_REL = {
