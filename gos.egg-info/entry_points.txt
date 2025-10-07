@@ -1,0 +1,2 @@
+[console_scripts]
+gos = gos.cli:main_menu

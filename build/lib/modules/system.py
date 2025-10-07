@@ -1,25 +1,7 @@
 # modules/system.py
 import platform
 import os
-# modules/system.py
-import subprocess
 
-def check_package(pkg_name):
-    """
-    Vérifie si un paquet est installé sur le système.
-    Retourne True si installé, False sinon.
-    Compatible Linux / Termux / macOS.
-    """
-    try:
-        result = subprocess.run(
-            ["which", pkg_name],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
-        return result.returncode == 0
-    except Exception:
-        return False
-        
 def detect_os():
     """
     Retourne une string parmi :

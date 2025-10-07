@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: gos
+Version: 1.0.0
+Summary: GoSpot Hybrid - Python + Shell CLI
+Author: Mauricio-100
+Requires-Python: >=3.7
+Dynamic: author
+Dynamic: requires-python
+Dynamic: summary
