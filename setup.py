@@ -13,7 +13,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "GoS = gospot_pkg.cli:main"
+            "gos = gospot_pkg.cli:main"
         ]
     },
     classifiers=[
