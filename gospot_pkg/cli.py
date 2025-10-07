@@ -5,13 +5,43 @@
 # GoSpot CLI - Point d'entrée principal
 # Rôle : Analyse les commandes de l'utilisateur, exécute les scripts locaux
 #        ou télécharge et exécute les scripts distants.
-# Auteur: Mauricio-100 & Gemini
+# Auteur: Mauricio-100 & Mauricio-kzz 
 # ==============================================================================
 
 import os
 import sys
 import subprocess
+def setup_env():
+    real_os = detect_os()
+    print("\n[⚙️] Vérification des outils essentiels...")
 
+    pkgs = ["openssh", "nmap", "curl", "git"]
+
+    # Détecte Termux avant Linux classique
+    prefix = os.getenv("PREFIX", "")
+    if "com.termux" in prefix:
+        print("[📱] Environnement Termux détecté")
+        for p in pkgs:
+            if not system.check_package(p):
+                os.system(f"pkg install -y {p}")  # pas de sudo
+
+    elif "DARWIN" in real_os or "MAC" in real_os:
+        print("[🍏] macOS détecté")
+        for p in pkgs:
+            if not system.check_package(p):
+                os.system(f"brew install {p} || echo '{p} manquant'")
+
+    elif "LINUX" in real_os:
+        print("[🐧] Linux détecté")
+        for p in pkgs:
+            if not system.check_package(p):
+                os.system(f"sudo apt install -y {p} || sudo pacman -S --noconfirm {p}")
+
+    else:
+        print("[❓] OS inconnu, installation des outils ignorée.")
+
+    print("\n[✅] Configuration terminée.\n")
+    input("[⏸] Appuie sur Entrée pour continuer.")
 # Essayer d'importer la librairie 'requests'. Si elle n'existe pas,
 # afficher un message d'aide clair à l'utilisateur.
 try:
