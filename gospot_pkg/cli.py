@@ -1,102 +1,105 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# ==============================================================
+#  GoSpot CLI — Powered by GoSpot SDK
+#  Author: Mauricio
+#  Repository: https://github.com/Mauricio-100/Vpyp
+# ==============================================================
+#  Ce client télécharge automatiquement le SDK GoSpot depuis
+#  le dépôt gospot-sdk-host, extrait les outils et permet
+#  d'exécuter directement les utilitaires inclus.
+# ==============================================================
 
 import os
 import sys
-import platform
-import subprocess
-import urllib.request
 import tarfile
-import shutil
-from time import sleep
+import tempfile
+import urllib.request
+import subprocess
 
 SDK_URL = "https://github.com/Mauricio-100/gospot-sdk-host/raw/main/public/gospot-sdk-1.0.0.tar.gz"
-SDK_PATH = "/gospot-sdk"
+LOCAL_CACHE = os.path.expanduser("~/.gospot-sdk")
+TOOLS_DIR = os.path.join(LOCAL_CACHE, "gospot-sdk", "sdk", "scripts")
 
-def clear():
-    os.system('cls' if os.name == 'nt' else 'clear')
+# --------------------------------------------------------------
+# Téléchargement du SDK
+# --------------------------------------------------------------
+def download_sdk():
+    os.makedirs(LOCAL_CACHE, exist_ok=True)
+    tar_path = os.path.join(LOCAL_CACHE, "gospot-sdk.tar.gz")
 
-def print_banner():
-    clear()
-    print("+----------------------------------------+")
-    print("|      GoSpot CLI — Python launcher      |")
-    print("+----------------------------------------+")
-    print(f"[Appareil] {platform.system()} {platform.machine()}")
-    print("")
+    print(f"📥 Téléchargement du SDK depuis : {SDK_URL}")
+    urllib.request.urlretrieve(SDK_URL, tar_path)
+    print(f"✅ SDK téléchargé → {tar_path}")
 
-def show_menu():
-    print("--- Connexion ---")
-    print("  1. Client (Rejoindre)")
-    print("  2. Serveur (Partager)")
-    print("\n--- Outils & SDK ---")
-    print("  3. Installer / Mettre à jour SDK & outils")
-    print("  4. Créer / Afficher clé SSH")
-    print("  5. Administration du Serveur")
-    print("\n  6. Quitter\n")
+    with tarfile.open(tar_path, "r:gz") as tar:
+        tar.extractall(LOCAL_CACHE)
+    print("📦 SDK extrait avec succès.")
+    os.remove(tar_path)
 
-def run_shell(script_path):
-    if not os.path.exists(script_path):
-        print(f"[!] Script introuvable: {script_path}")
-        input("Appuyez Entrée pour revenir au menu...")
-        return
-    try:
-        subprocess.run(["bash", script_path], check=True)
-    except KeyboardInterrupt:
-        print("\n[!] Reçu signal Ctrl+C. Arrêt.")
-        sleep(1)
-    except Exception as e:
-        print(f"[!] Erreur: {e}")
-        input("Appuyez Entrée pour revenir au menu...")
+# --------------------------------------------------------------
+# Vérification ou téléchargement automatique
+# --------------------------------------------------------------
+def ensure_sdk_ready():
+    if not os.path.exists(TOOLS_DIR):
+        print("⚙️  SDK introuvable localement. Téléchargement en cours...")
+        download_sdk()
+    else:
+        print("✅ SDK déjà présent localement.")
 
-def install_sdk():
-    print(f"[GoSpot] Téléchargement du SDK depuis: {SDK_URL}")
-    tmp_tar = "/tmp/gospot-sdk.tar.gz"
-    try:
-        urllib.request.urlretrieve(SDK_URL, tmp_tar, reporthook=progress_hook)
-    except Exception as e:
-        print(f"[!] Erreur téléchargement SDK: {e}")
-        input("Appuyez Entrée pour revenir au menu...")
-        return
+# --------------------------------------------------------------
+# Exécution d’un outil shell du SDK
+# --------------------------------------------------------------
+def run_tool(tool_name, *args):
+    ensure_sdk_ready()
+    tool_path = os.path.join(TOOLS_DIR, f"{tool_name}.sh")
 
-    if os.path.exists(SDK_PATH):
-        shutil.rmtree(SDK_PATH)
-    os.makedirs(SDK_PATH, exist_ok=True)
+    if not os.path.isfile(tool_path):
+        print(f"❌ Outil '{tool_name}' introuvable dans le SDK.")
+        sys.exit(1)
 
-    with tarfile.open(tmp_tar) as tar:
-        tar.extractall(path=SDK_PATH)
-    os.remove(tmp_tar)
-    print("\n[✔] SDK installé avec succès!")
-    input("Appuyez Entrée pour revenir au menu...")
+    print(f"🚀 Exécution de {tool_name}.sh ...")
+    subprocess.run(["sh", tool_path, *args])
 
-def progress_hook(count, block_size, total_size):
-    progress = int(count * block_size * 100 / total_size)
-    progress = min(progress, 100)
-    bar = '#' * (progress // 2) + '-' * (50 - progress // 2)
-    print(f"\r[{bar}] {progress}% ", end='', flush=True)
+# --------------------------------------------------------------
+# Menu d’aide
+# --------------------------------------------------------------
+def show_help():
+    print("""
+GoSpot CLI — Contrôle des outils SDK
+Usage :
+    gospot <commande> [arguments]
 
+Commandes disponibles :
+    sysinfo     → Affiche les infos système
+    nettools    → Outils réseau
+    ssh         → Connexion SSH simplifiée
+    speedtest   → Test de vitesse
+    admin       → Commandes administratives
+    monitor     → Surveillance système
+    tools       → Outils utilitaires
+    update      → Force la mise à jour du SDK
+    help        → Affiche ce message
+""")
+
+# --------------------------------------------------------------
+# Point d’entrée principal
+# --------------------------------------------------------------
 def main():
-    while True:
-        print_banner()
-        show_menu()
-        choice = input("Votre choix (1-6) : ").strip()
-        if choice == "1":
-            print("[GoSpot] Lancement du client...")
-            run_shell(os.path.join(SDK_PATH, "sdk/scripts/client.sh"))
-        elif choice == "2":
-            print("[GoSpot] Lancement du serveur...")
-            run_shell(os.path.join(SDK_PATH, "sdk/scripts/server.sh"))
-        elif choice == "3":
-            install_sdk()
-        elif choice == "4":
-            run_shell(os.path.join(SDK_PATH, "sdk/scripts/ssh.sh"))
-        elif choice == "5":
-            run_shell(os.path.join(SDK_PATH, "sdk/scripts/admin.sh"))
-        elif choice == "6":
-            print("[GoSpot] Bye 👋")
-            sys.exit(0)
-        else:
-            print("[!] Choix invalide. Réessayez.")
-            sleep(1)
+    if len(sys.argv) < 2:
+        show_help()
+        sys.exit(0)
+
+    cmd = sys.argv[1]
+
+    if cmd == "update":
+        print("🔄 Mise à jour manuelle du SDK...")
+        download_sdk()
+        print("✅ Mise à jour terminée.")
+    elif cmd == "help":
+        show_help()
+    else:
+        args = sys.argv[2:]
+        run_tool(cmd, *args)
 
 if __name__ == "__main__":
     main()
