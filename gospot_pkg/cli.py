@@ -11,7 +11,7 @@
 import os
 import sys
 import subprocess
-
+from gospot_pkg.modules import system, network
 # Essayer d'importer la librairie 'requests'. Si elle n'existe pas,
 # afficher un message d'aide clair à l'utilisateur.
 try:
