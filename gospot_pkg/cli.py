@@ -11,7 +11,7 @@ import shutil
 from time import sleep
 
 SDK_URL = "https://github.com/Mauricio-100/gospot-sdk-host/raw/main/public/gospot-sdk-1.0.0.tar.gz"
-SDK_PATH = "/tmp/gospot-sdk"
+SDK_PATH = "/gospot-sdk"
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
