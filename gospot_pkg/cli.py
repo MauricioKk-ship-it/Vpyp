@@ -19,7 +19,7 @@ def clear():
 def print_banner():
     clear()
     print("+----------------------------------------+")
-    print("|      GoSpot CLI — Python ( by Dragon ) |")
+    print("|      GoSpot CLI — Python launcher      |")
     print("+----------------------------------------+")
     print(f"[Appareil] {platform.system()} {platform.machine()}")
     print("")
