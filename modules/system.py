@@ -1,19 +1,38 @@
-import subprocess, os
+# modules/system.py
+import platform
+import os
 
-def run(cmd, capture=False):
-    """Exécute une commande shell"""
-    print(f"$ {cmd}")
-    if capture:
-        return subprocess.check_output(cmd, shell=True, text=True)
-    return subprocess.call(cmd, shell=True)
-
-def clear():
-    os.system('clear' if os.name == 'posix' else 'cls')
-
-def check_package(pkg):
-    """Vérifie si un paquet est installé"""
-    try:
-        subprocess.check_output(f"command -v {pkg}", shell=True)
-        return True
-    except subprocess.CalledProcessError:
-        return False
+def detect_os():
+    """
+    Retourne une string parmi :
+    TERMUX, ISH, MACOS, WSL, DEBIAN, FEDORA, ARCH, ALPINE, WINDOWS, UNKNOWN
+    """
+    uname = platform.system()
+    if uname == "Darwin":
+        return "MACOS"
+    if uname == "Linux":
+        # check Termux (PREFIX env or termux-info)
+        if os.getenv("PREFIX", "").find("com.termux") != -1 or os.path.exists("/data/data/com.termux"):
+            return "TERMUX"
+        # check WSL
+        try:
+            with open("/proc/version", "r") as f:
+                v = f.read().lower()
+                if "microsoft" in v:
+                    return "WSL"
+        except Exception:
+            pass
+        # check alpine
+        if os.path.exists("/etc/alpine-release"):
+            return "ALPINE"
+        # check package managers
+        if os.path.exists("/usr/bin/apt") or os.path.exists("/bin/apt"):
+            return "DEBIAN"
+        if os.path.exists("/usr/bin/dnf") or os.path.exists("/bin/dnf"):
+            return "FEDORA"
+        if os.path.exists("/usr/bin/pacman") or os.path.exists("/bin/pacman"):
+            return "ARCH"
+        return "LINUX"
+    if uname.startswith("MINGW") or uname.startswith("CYGWIN") or "Windows" in uname:
+        return "WINDOWS"
+    return "UNKNOWN"
